@@ -64,9 +64,17 @@ echo "--> Linking Mach-O 32-bit ARMv7 kernel binary at 0x00008000..."
 echo "--> Stripping symbols for production kernel..."
 cp "$BUILD_DIR/mach_kernel.sys" "$BUILD_DIR/mach_kernel"
 "$TOOLCHAIN_BIN/strip" "$BUILD_DIR/mach_kernel"
-cp "$BUILD_DIR/mach_kernel" "$BUILD_DIR/kernel.mach"
 
-# 4. Compile Userland & Generate Live RAM RootFS (ramdisk_live.img)
+# 4. Patch Mach-O kernel into executable ARM Linux zImage for Qualcomm LK
+echo "--> Generating executable ARM Linux zImage (zImage)..."
+python3 "$REPO_DIR/scripts/patch_kernel_zimage.py" \
+    "$BUILD_DIR/mach_kernel.sys" \
+    "$BUILD_DIR/mach_kernel" \
+    "$TOOLCHAIN_BIN/nm" \
+    "$BUILD_DIR/zImage"
+cp "$BUILD_DIR/zImage" "$BUILD_DIR/kernel.mach"
+
+# 5. Compile Userland & Generate Live RAM RootFS (ramdisk_live.img)
 echo "--> Generating Live-in-RAM RootFS (ramdisk_live.img)..."
 if [ ! -f "$BUILD_DIR/SpringBoard" ]; then
     bash "$REPO_DIR/scripts/build_rootfs.sh"
@@ -78,10 +86,10 @@ fi
 )
 cp "$BUILD_DIR/ramdisk_live.img" "$BUILD_DIR/ramdisk.img"
 
-# 5. Package Android boot.img (Header v0 + QCDT + Live RAM RootFS)
+# 6. Package Android boot.img (Header v0 + QCDT + Live RAM RootFS)
 echo "--> Packaging Qualcomm boot.img with Live RAM RootFS..."
 python3 "$REPO_DIR/scripts/mkbootimg.py" \
-    --kernel "$BUILD_DIR/kernel.mach" \
+    --kernel "$BUILD_DIR/zImage" \
     --ramdisk "$BUILD_DIR/ramdisk_live.img" \
     --dt "$REPO_DIR/scripts/dt.img" \
     --base 0x00000000 \
@@ -93,10 +101,10 @@ python3 "$REPO_DIR/scripts/mkbootimg.py" \
     --board "matissewifi" \
     -o "$BUILD_DIR/boot.img"
 
-# 6. Create recovery.img for Non-Invasive Dual-Boot
+# 7. Create recovery.img for Non-Invasive Dual-Boot
 cp "$BUILD_DIR/boot.img" "$BUILD_DIR/recovery.img"
 
-# 7. Create Samsung Odin flashable packages (boot.tar.md5 and recovery.tar.md5)
+# 8. Create Samsung Odin flashable packages (boot.tar.md5 and recovery.tar.md5)
 echo "--> Packaging Samsung Odin boot.tar.md5 and recovery.tar.md5..."
 (
     cd "$BUILD_DIR"
@@ -213,6 +221,7 @@ echo "--> Generating SHA256SUMS.txt..."
     sha256sum \
         mach_kernel \
         mach_kernel.sys \
+        zImage \
         boot.img \
         boot.tar.md5 \
         recovery.img \

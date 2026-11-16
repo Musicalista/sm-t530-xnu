@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CacheExtra</key>
+    <dict>
+        <key>DeviceClass</key>
+        <string>iPad</string>
+        <key>ProductType</key>
+        <string>iPad3,1</string>
+        <key>HardwareModel</key>
+        <string>j1ap</string>
+        <key>ArtworkDeviceSubType</key>
+        <integer>1024</integer>
+        <key>UIUserInterfaceIdiom</key>
+        <integer>1</integer>
+        <key>MainScreenWidth</key>
+        <integer>1280</integer>
+        <key>MainScreenHeight</key>
+        <integer>800</integer>
+        <key>MainScreenScale</key>
+        <real>1.0</real>
+        <key>iPadCapability</key>
+        <true/>
+    </dict>
+</dict>
+</plist>

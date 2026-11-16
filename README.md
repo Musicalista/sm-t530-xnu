@@ -58,19 +58,26 @@ sm-t530-xnu/
 ├── README.md               # Main architecture & port documentation
 ├── docs/
 │   ├── hardware-map.md     # Qualcomm MSM8226 register & memory layout
-│   └── flashing-guide.md   # Step-by-step Odin and TWRP installation
+│   ├── hardware-map.md     # Qualcomm MSM8226 register & memory layout
+│   ├── flashing-guide.md   # Step-by-step Odin and TWRP installation
+│   └── ipad-userland.md    # Apple iPad tablet userland architecture & layout
 ├── include/
 │   ├── msm8226_regs.h      # MSM8226 MMIO register definitions
 │   ├── darwin_boot.h       # Darwin boot arguments and video structures
 │   └── t530_types.h        # Freestanding fixed-width types
 ├── patches/                # Modular kernel patch series
 ├── scripts/
-│   ├── build.sh            # Orchestrated ARMv7 compiler & packager script
+│   ├── build.sh            # Orchestrated ARMv7 kernel compiler & packager script
+│   ├── build_rootfs.sh     # iPad userland compiler & ext4/tar/zip packager
 │   ├── mkbootimg.py        # Qualcomm boot.img v0 packager with QCDT support
 │   └── dt.img              # Authentic Qualcomm QCDT image (578 KB)
 ├── src/
 │   ├── entry.s             # ARMv7 entry trampoline & zImage header
 │   └── main.c              # Darwin hardware bootstrap & peripheral drivers
+├── userland/               # iPad Userland source & configuration
+│   ├── include/            # Framebuffer graphics & UI headers
+│   ├── plists/             # MobileGestalt, SpringBoard & LaunchDaemons plists
+│   └── src/                # launchd, SpringBoard, backboardd, Preferences, Safari
 └── build/                  # Production binaries and checksums
 ```
 
@@ -83,8 +90,11 @@ sm-t530-xnu/
 git clone https://github.com/Musicalista/sm-t530-xnu.git
 cd sm-t530-xnu
 
-# Execute build pipeline
+# Build Darwin / XNU Kernel
 bash scripts/build.sh
+
+# Build Apple iPad Tablet Userland & RootFS (system.img, system.tar.md5, TWRP zip)
+bash scripts/build_rootfs.sh
 ```
 
 ---
@@ -95,9 +105,15 @@ The compiled binaries are available in [Releases v1.0.0](https://github.com/Musi
 
 | File | Purpose | Flashing Tool |
 |---|---|---|
-| `boot.tar.md5` | Samsung Odin flashable package (AP slot) | Odin3 v3.07 / v3.10 |
-| `sm-t530-ios10-xnu-twrp.zip` | TWRP recovery flashable zip | TWRP Recovery |
+| `boot.tar.md5` | Darwin kernel for Samsung Odin (AP slot) | Odin3 v3.07 / v3.10 |
+| `system.tar.md5` | iPad tablet system rootfs for Samsung Odin (AP slot) | Odin3 v3.07 / v3.10 |
+| `sm-t530-ios10-xnu-twrp.zip` | Darwin kernel TWRP flashable zip | TWRP Recovery |
+| `sm-t530-ipad-rootfs-twrp.zip` | iPad tablet userland TWRP flashable zip | TWRP Recovery |
+| `system.img` | Raw 256MB ext4 filesystem image | dd / fastboot |
 | `boot.img` | Raw Android v0 boot image (2048B pages + QCDT) | Fastboot / dd |
-| `mach_kernel` | Stripped production Mach-O ARMv7 binary | U-Boot / LK |
-| `mach_kernel.sys` | Unstripped Mach-O ARMv7 binary with symbols | GDB / JTAG |
-| `SHA256SUMS.txt` | Cryptographic hashes | sha256sum |
+| `mach_kernel` | Stripped production Mach-O ARMv7 kernel binary | U-Boot / LK |
+| `SpringBoard` | Stripped ARMv7 Mach-O iPad UI window manager | System Userland |
+| `Preferences` | Stripped ARMv7 Mach-O iPad 2-column Settings | System Userland |
+| `MobileSafari` | Stripped ARMv7 Mach-O iPad Tabbed Web Browser | System Userland |
+| `launchd` | Stripped ARMv7 Mach-O PID 1 init bootstrap | System Userland |
+| `SHA256SUMS.txt` | Cryptographic hashes for all binaries | sha256sum |

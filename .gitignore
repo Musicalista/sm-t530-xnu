@@ -1,5 +1,9 @@
 # Temporary build objects
 *.o
 build/twrp_staging/
+build/twrp_rootfs_staging/
+build/rootfs_staging/
 build/ramdisk.img
 build/kernel.mach
+build/system.img
+build/system.tar.md5

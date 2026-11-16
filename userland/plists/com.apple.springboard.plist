@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.apple.SpringBoard</string>
+    <key>Program</key>
+    <string>/System/Library/CoreServices/SpringBoard.app/SpringBoard</string>
+    <key>KeepAlive</key>
+    <true/>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>/private/var/mobile</string>
+        <key>CFFIXED_USER_HOME</key>
+        <string>/private/var/mobile</string>
+        <key>UIUserInterfaceIdiom</key>
+        <string>1</string>
+        <key>FB_WIDTH</key>
+        <string>1280</string>
+        <key>FB_HEIGHT</key>
+        <string>800</string>
+    </dict>
+</dict>
+</plist>

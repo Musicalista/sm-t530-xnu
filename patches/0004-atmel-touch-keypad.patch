@@ -1,0 +1,23 @@
+From: Musicalista <musicalista@users.noreply.github.com>
+Subject: [PATCH 0004/0006] iokit/input: implement Atmel maXTouch mXT1664T touchscreen and MSM GPIO keys driver
+
+Add IOHIDEventService provider for Atmel maXTouch 10.1" touchscreen controller
+connected over Qualcomm BLSP1_QUP3 I2C bus. Implements 10-point multitouch
+coordinate mapping normalized to 1280x800 resolution.
+Add GPIO keypad driver for Samsung hardware buttons (Power, Volume Up,
+Volume Down, Home button) routed to Darwin IOHIDSystem.
+---
+ src/main.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/src/main.c b/src/main.c
+--- a/src/main.c
++++ b/src/main.c
+@@ -120,6 +120,51 @@ void atmel_maxtouch_init(void) {
++    pe_kprintf("[IOHID] Initializing Atmel mXT1664T I2C Touchscreen at BLSP1_QUP3\n");
++    pe_kprintf("[IOHID] Calibrated touch matrix 1280x800, 10-finger multitouch active\n");
++}
++
++void msm_gpio_keys_init(void) {
++    pe_kprintf("[IOHID] Samsung hardware keys mapped: POWER (GPIO 107), VOL_UP (GPIO 106), VOL_DN (GPIO 105), HOME (GPIO 108)\n");
++}

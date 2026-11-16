@@ -1,0 +1,75 @@
+From: Musicalista <musicalista@users.noreply.github.com>
+Subject: [PATCH 0001/0006] arm: implement ARMv7 Cortex-A7 entry trampoline and zImage header for MSM8226
+
+Add low-level assembly bootstrap for Samsung Galaxy Tab 4 10.1 (SM-T530).
+Includes Linux zImage header at 0x00 for Qualcomm LK compatibility,
+CP15 cache/TLB invalidation, ACTLR SMP mode enable, VFPv4/NEON enable,
+and early visual framebuffer checkpoint bar for 1280x800 display.
+---
+ src/entry.s | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
+
+diff --git a/src/entry.s b/src/entry.s
+new file mode 100644
+--- /dev/null
++++ b/src/entry.s
+@@ -0,0 +1,68 @@
++/*
++ * entry.s - Low-Level ARMv7 Entry Trampoline & Linux zImage Header
++ * Target: Samsung Galaxy Tab 4 10.1 (SM-T530 / matissewifi, Qualcomm APQ8026)
++ * Darwin 16.7.0 (iOS 10.3.3)
++ */
++
++.text
++.arm
++.globl __entry
++.globl __start
++
++__entry:
++    b       __start
++    .word   0x00000000
++    .word   0x016f2818              /* Linux zImage Magic */
++    .word   0x00008000              /* Kernel Start Address */
++    .word   0x00200000              /* Kernel End Address */
++
++__start:
++    msr     cpsr_c, #0xD3
++    mov     r4, r0
++    mov     r5, r1
++    mov     r6, r2
++
++    /* Invalidate Cortex-A7 Caches & TLB via CP15 */
++    mov     r0, #0
++    mcr     p15, 0, r0, c7, c7, 0
++    mcr     p15, 0, r0, c8, c7, 0
++    dsb
++    isb
++
++    /* Enable SMP coherency in ACTLR (bit 6) */
++    mrc     p15, 0, r0, c1, c0, 1
++    orr     r0, r0, #(1 << 6)
++    mcr     p15, 0, r0, c1, c0, 1
++    isb
++
++    /* Enable VFPv4 & NEON Coprocessors */
++    mrc     p15, 0, r0, c1, c0, 2
++    orr     r0, r0, #0x00F00000
++    mcr     p15, 0, r0, c1, c0, 2
++    isb
++    mov     r0, #0x40000000
++    vmsr    fpexc, r0
++
++    /* Early visual checkpoint */
++    ldr     r7, =0x03200000
++    ldr     r8, =0x07FF07FF
++    ldr     r9, =12800
++paint_bar:
++    str     r8, [r7], #4
++    subs    r9, r9, #1
++    bne     paint_bar
++
++    ldr     sp, =0x01FF0000
++    bl      _darwin_arm_init
++halt:
++    wfe
++    b       halt

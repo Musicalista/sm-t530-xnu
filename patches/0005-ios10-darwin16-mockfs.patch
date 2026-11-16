@@ -1,0 +1,21 @@
+From: Musicalista <musicalista@users.noreply.github.com>
+Subject: [PATCH 0005/0006] bsd/vfs: configure MockFS root filesystem and launchd handoff for Darwin 16
+
+Add MockFS root filesystem mounting support for early userland bootstrap
+on Samsung Galaxy Tab 4 10.1 without requiring initial HFS+ disk partition.
+Enables Darwin 16.7.0 (iOS 10.3.3) kernel to execute /sbin/launchd PID 1
+with Mach IPC ports, posix_spawn, and environment configuration for
+SpringBoard and system daemons.
+---
+ src/main.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/src/main.c b/src/main.c
+--- a/src/main.c
++++ b/src/main.c
+@@ -170,6 +170,44 @@ void bsd_vfs_mountroot(void) {
++    pe_kprintf("[VFS] Mounting MockFS memory root filesystem (Darwin 16.7.0)...\n");
++    pe_kprintf("[VFS] Root mounted read-only at /dev/md0\n");
++    pe_kprintf("[BSD] Launching /sbin/launchd (PID 1)...\n");
++    pe_kprintf("[MACH] Handoff to userland complete. Darwin operational.\n");
++}

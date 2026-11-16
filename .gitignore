@@ -1,0 +1,5 @@
+# Temporary build objects
+*.o
+build/twrp_staging/
+build/ramdisk.img
+build/kernel.mach
